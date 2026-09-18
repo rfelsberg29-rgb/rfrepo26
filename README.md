@@ -15,9 +15,16 @@ Open [`rifthockey.html`](./rifthockey.html) in any browser.
 - First to **5** wins
 
 ### Curveball — Hangman
-Hangman with a sports twist. Guess letters across Sports, Movies, and Fun Stuff before six strikes.
+Hangman with a sports twist. Guess letters across **Sports**, **Movies**, and **Fun Stuff** before you rack up six strikes.
 
 Open [`hangman.html`](./hangman.html) in any browser.
+
+**How to play**
+- Guess letters with the on-screen keyboard or your physical keyboard
+- Six wrong guesses = strikeout
+- **Throw Curveball** once per round to reveal a random hidden letter
+- Categories rotate: stadium sports, movie titles, and fun stuff
+- Track your streak and wins across rounds
 
 ## Clone & play
 
@@ -34,8 +41,13 @@ open hangman.html
 |------|------------|
 | `rifthockey.html` | Rift Hockey (HTML + CSS + JavaScript) |
 | `hangman.html` | Curveball Hangman (HTML + CSS + JavaScript) |
+| `LICENSE` | MIT |
 
 ## Built with
 
 - Plain HTML, CSS, and JavaScript
 - No frameworks or dependencies
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
