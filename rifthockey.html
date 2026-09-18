@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>RIFT HOCKEY — Knock Hockey with a Twist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a1218;
+      --board: #1a2e28;
+      --chalk: #e8f0e9;
+      --amber: #f5b942;
+      --cyan: #3de0c5;
+      --rift: #7cf0ff;
+      --strike: #e84a3c;
+      --muted: #8aa899;
+      --glass: rgba(232, 240, 233, 0.08);
+      --line: rgba(232, 240, 233, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--chalk);
+      background:
+        radial-gradient(ellipse 80% 50% at 15% -5%, rgba(61, 224, 197, 0.16), transparent 55%),
+        radial-gradient(ellipse 70% 45% at 95% 10%, rgba(245, 185, 66, 0.14), transparent 50%),
+        linear-gradient(165deg, #060d12 0%, var(--ink) 45%, #0c1a16 100%);
+      overflow-x: hidden;
+      touch-action: none;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 47px, rgba(232, 240, 233, 0.03) 47px, rgba(232, 240, 233, 0.03) 48px),
+        repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(232, 240, 233, 0.03) 47px, rgba(232, 240, 233, 0.03) 48px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+      animation: rise 0.65s ease-out both;
+    }
+
+    .brand {
+      font-family: "Archivo Black", sans-serif;
+      font-size: clamp(2.4rem, 11vw, 3.6rem);
+      letter-spacing: 0.03em;
+      line-height: 0.95;
+      background: linear-gradient(180deg, #fff 15%, var(--cyan) 55%, var(--amber) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .tag {
+      margin-top: 0.45rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      animation: rise 0.65s ease-out 0.08s both;
+    }
+
+    .score-card {
+      flex: 1;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.55rem 0.75rem;
+      text-align: center;
+    }
+
+    .score-card .who {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .score-card .pts {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.65rem;
+      line-height: 1.1;
+    }
+
+    .score-card.you .pts { color: var(--amber); }
+    .score-card.rival .pts { color: var(--cyan); }
+
+    .meta {
+      text-align: center;
+      min-width: 5.5rem;
+    }
+
+    .meta .to {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .meta .mode {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--chalk);
+    }
+
+    .stage {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      animation: rise 0.65s ease-out 0.14s both;
+      aspect-ratio: 3 / 5;
+      background: #0d1a16;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
+      padding: 1.5rem;
+      background: rgba(6, 13, 18, 0.82);
+      backdrop-filter: blur(6px);
+      text-align: center;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .overlay h2 {
+      font-family: "Archivo Black", sans-serif;
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+      letter-spacing: 0.04em;
+    }
+
+    .overlay p {
+      color: var(--muted);
+      max-width: 22rem;
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+
+    .btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      justify-content: center;
+      margin-top: 0.35rem;
+    }
+
+    button {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 999px;
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    button:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--amber), #e89a20);
+      color: #1a1205;
+    }
+
+    .btn-secondary {
+      background: rgba(61, 224, 197, 0.18);
+      color: var(--cyan);
+      border: 1px solid rgba(61, 224, 197, 0.45);
+    }
+
+    .help {
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+      animation: rise 0.65s ease-out 0.2s both;
+    }
+
+    .help strong { color: var(--chalk); }
+
+    .banner {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%, -50%) scale(0.85);
+      font-family: "Archivo Black", sans-serif;
+      font-size: clamp(1.4rem, 5vw, 2rem);
+      letter-spacing: 0.06em;
+      color: var(--rift);
+      text-shadow: 0 0 24px rgba(124, 240, 255, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 2;
+      white-space: nowrap;
+    }
+
+    .banner.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 420px) {
+      .help { font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">RIFT HOCKEY</div>
+      <p class="tag">Knock hockey — but the table is tearing open</p>
+    </header>
+
+    <div class="hud">
+      <div class="score-card you">
+        <div class="who" id="you-label">You</div>
+        <div class="pts" id="score-you">0</div>
+      </div>
+      <div class="meta">
+        <div class="to">First to</div>
+        <div class="mode" id="goal-target">5</div>
+      </div>
+      <div class="score-card rival">
+        <div class="who" id="rival-label">Rift AI</div>
+        <div class="pts" id="score-rival">0</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <canvas id="game" width="420" height="700"></canvas>
+      <div class="banner" id="banner"></div>
+
+      <div class="overlay" id="menu">
+        <h2>OPEN THE RIFT</h2>
+        <p>
+          Classic knock hockey with a twist: side <strong style="color:var(--cyan)">rifts</strong> teleport the puck,
+          and a center <strong style="color:var(--amber)">vortex</strong> can yank it mid-rally.
+        </p>
+        <div class="btns">
+          <button class="btn-primary" id="btn-ai">Play vs AI</button>
+          <button class="btn-secondary" id="btn-2p">2 Players</button>
+        </div>
+      </div>
+
+      <div class="overlay hidden" id="goal-overlay">
+        <h2 id="goal-title">GOAL!</h2>
+        <p id="goal-msg">Point scored.</p>
+        <div class="btns">
+          <button class="btn-primary" id="btn-next">Faceoff</button>
+        </div>
+      </div>
+
+      <div class="overlay hidden" id="win-overlay">
+        <h2 id="win-title">YOU WIN</h2>
+        <p id="win-msg">The table cracks in your favor.</p>
+        <div class="btns">
+          <button class="btn-primary" id="btn-rematch">Rematch</button>
+          <button class="btn-secondary" id="btn-menu">Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="help">
+      <strong>You (bottom):</strong> move with mouse / touch, or <strong>A D</strong> · charge smash with <strong>click / Space</strong><br />
+      <strong>Player 2 (top):</strong> <strong>← →</strong> move · <strong>Shift</strong> smash<br />
+      <strong>Twist:</strong> shoot into the glowing side rifts to warp — watch the vortex when it wakes up.
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width;
+      const H = canvas.height;
+
+      const menu = document.getElementById("menu");
+      const goalOverlay = document.getElementById("goal-overlay");
+      const winOverlay = document.getElementById("win-overlay");
+      const banner = document.getElementById("banner");
+      const scoreYouEl = document.getElementById("score-you");
+      const scoreRivalEl = document.getElementById("score-rival");
+      const youLabel = document.getElementById("you-label");
+      const rivalLabel = document.getElementById("rival-label");
+
+      const TO_WIN = 5;
+      const FRICTION = 0.988;
+      const WALL_BOUNCE = 0.92;
+      const PUCK_R = 11;
+      const MALLET_R = 22;
+      const GOAL_W = 118;
+      const MAX_SPEED = 16;
+
+      const keys = new Set();
+      let mode = "ai"; // "ai" | "2p"
+      let running = false;
+      let waitingFaceoff = false;
+      let scores = { you: 0, rival: 0 };
+      let particles = [];
+      let bannerTimer = 0;
+      let lastTs = 0;
+      let pointerDown = false;
+      let pointerX = W / 2;
+      let chargeYou = 0;
+      let chargeRival = 0;
+      let vortex = { active: false, strength: 0, timer: 0, nextIn: 8 };
+      let shake = 0;
+      let trail = [];
+
+      const table = {
+        x: 28,
+        y: 48,
+        w: W - 56,
+        h: H - 96,
+      };
+
+      const rifts = [
+        { side: "left", y: H * 0.32, h: 70, cooldown: 0 },
+        { side: "right", y: H * 0.32, h: 70, cooldown: 0 },
+        { side: "left", y: H * 0.68, h: 70, cooldown: 0 },
+        { side: "right", y: H * 0.68, h: 70, cooldown: 0 },
+      ];
+
+      const puck = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
+      const you = { x: W / 2, y: table.y + table.h - 70, px: W / 2, py: table.y + table.h - 70 };
+      const rival = { x: W / 2, y: table.y + 70, px: W / 2, py: table.y + 70 };
+
+      function showBanner(text, ms = 900) {
+        banner.textContent = text;
+        banner.classList.add("show");
+        bannerTimer = ms;
+      }
+
+      function resetPuck(towardRival = Math.random() > 0.5) {
+        puck.x = W / 2;
+        puck.y = H / 2;
+        puck.vx = (Math.random() - 0.5) * 1.2;
+        puck.vy = towardRival ? -2.4 : 2.4;
+        trail = [];
+      }
+
+      function resetMallets() {
+        you.x = you.px = W / 2;
+        you.y = you.py = table.y + table.h - 70;
+        rival.x = rival.px = W / 2;
+        rival.y = rival.py = table.y + 70;
+        chargeYou = 0;
+        chargeRival = 0;
+      }
+
+      function startMatch(selectedMode) {
+        mode = selectedMode;
+        scores = { you: 0, rival: 0 };
+        scoreYouEl.textContent = "0";
+        scoreRivalEl.textContent = "0";
+        youLabel.textContent = mode === "2p" ? "P1 Bottom" : "You";
+        rivalLabel.textContent = mode === "2p" ? "P2 Top" : "Rift AI";
+        menu.classList.add("hidden");
+        goalOverlay.classList.add("hidden");
+        winOverlay.classList.add("hidden");
+        resetMallets();
+        resetPuck();
+        vortex = { active: false, strength: 0, timer: 0, nextIn: 7 + Math.random() * 5 };
+        running = true;
+        waitingFaceoff = false;
+        showBanner("FACEOFF", 800);
+      }
+
+      function endPoint(scorer) {
+        running = false;
+        waitingFaceoff = true;
+        if (scorer === "you") scores.you += 1;
+        else scores.rival += 1;
+        scoreYouEl.textContent = String(scores.you);
+        scoreRivalEl.textContent = String(scores.rival);
+
+        if (scores.you >= TO_WIN || scores.rival >= TO_WIN) {
+          const youWon = scores.you >= TO_WIN;
+          document.getElementById("win-title").textContent = youWon
+            ? (mode === "2p" ? "P1 WINS" : "YOU WIN")
+            : (mode === "2p" ? "P2 WINS" : "RIFT WINS");
+          document.getElementById("win-msg").textContent = youWon
+            ? "You bent the table to your will."
+            : "The rifts claimed this match.";
+          winOverlay.classList.remove("hidden");
+          return;
+        }
+
+        document.getElementById("goal-title").textContent = "GOAL!";
+        document.getElementById("goal-msg").textContent =
+          scorer === "you"
+            ? (mode === "2p" ? "Point for bottom." : "You scored through the chaos.")
+            : (mode === "2p" ? "Point for top." : "The AI slipped one past you.");
+        goalOverlay.classList.remove("hidden");
+      }
+
+      function spawnBurst(x, y, color, n = 14) {
+        for (let i = 0; i < n; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const sp = 1 + Math.random() * 3.5;
+          particles.push({
+            x, y,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp,
+            life: 400 + Math.random() * 350,
+            color,
+            r: 1.5 + Math.random() * 2.5,
+          });
+        }
+      }
+
+      function clampMallet(m, isYou) {
+        const minY = isYou ? H / 2 + MALLET_R + 8 : table.y + MALLET_R + 8;
+        const maxY = isYou ? table.y + table.h - MALLET_R - 8 : H / 2 - MALLET_R - 8;
+        m.x = Math.max(table.x + MALLET_R + 4, Math.min(table.x + table.w - MALLET_R - 4, m.x));
+        m.y = Math.max(minY, Math.min(maxY, m.y));
+      }
+
+      function hitMallet(m, charge) {
+        const dx = puck.x - m.x;
+        const dy = puck.y - m.y;
+        const dist = Math.hypot(dx, dy);
+        const minDist = PUCK_R + MALLET_R;
+        if (dist >= minDist || dist < 0.001) return;
+
+        const nx = dx / dist;
+        const ny = dy / dist;
+        puck.x = m.x + nx * minDist;
+        puck.y = m.y + ny * minDist;
+
+        const mvx = m.x - m.px;
+        const mvy = m.y - m.py;
+        const boost = 0.55 + charge * 0.9;
+        const base = 3.2 + charge * 7;
+
+        let rvx = puck.vx - mvx;
+        let rvy = puck.vy - mvy;
+        const vn = rvx * nx + rvy * ny;
+        if (vn < 0) {
+          rvx -= (1.65 + charge) * vn * nx;
+          rvy -= (1.65 + charge) * vn * ny;
+        }
+
+        puck.vx = rvx + mvx * boost + nx * base * 0.35;
+        puck.vy = rvy + mvy * boost + ny * base * 0.35;
+
+        const speed = Math.hypot(puck.vx, puck.vy);
+        if (speed > MAX_SPEED) {
+          puck.vx = (puck.vx / speed) * MAX_SPEED;
+          puck.vy = (puck.vy / speed) * MAX_SPEED;
+        }
+
+        shake = Math.min(8, shake + 2 + charge * 4);
+        spawnBurst(puck.x, puck.y, charge > 0.45 ? "#f5b942" : "#e8f0e9", charge > 0.45 ? 18 : 10);
+      }
+
+      function updateRifts(dt) {
+        for (const r of rifts) {
+          if (r.cooldown > 0) r.cooldown -= dt;
+        }
+
+        for (const r of rifts) {
+          if (r.cooldown > 0) continue;
+          const rx = r.side === "left" ? table.x : table.x + table.w;
+          const inY = puck.y > r.y - r.h / 2 && puck.y < r.y + r.h / 2;
+          const nearX =
+            r.side === "left"
+              ? puck.x - PUCK_R <= table.x + 6
+              : puck.x + PUCK_R >= table.x + table.w - 6;
+
+          if (inY && nearX) {
+            const pair = rifts.find(
+              (o) => o !== r && o.side !== r.side && Math.abs(o.y - r.y) < 1
+            ) || rifts.find((o) => o !== r && o.side !== r.side);
+
+            if (pair) {
+              puck.x = pair.side === "left" ? table.x + PUCK_R + 10 : table.x + table.w - PUCK_R - 10;
+              puck.y = pair.y + (puck.y - r.y) * 0.35;
+              puck.vx *= -1.05;
+              puck.vy *= 1.08;
+              r.cooldown = 0.55;
+              pair.cooldown = 0.55;
+              shake = Math.min(10, shake + 5);
+              spawnBurst(puck.x, puck.y, "#7cf0ff", 22);
+              showBanner("RIFT WARP", 700);
+            }
+          }
+        }
+      }
+
+      function updateVortex(dt) {
+        if (!vortex.active) {
+          vortex.nextIn -= dt;
+          if (vortex.nextIn <= 0) {
+            vortex.active = true;
+            vortex.strength = 0;
+            vortex.timer = 3.2 + Math.random() * 1.4;
+            showBanner("VORTEX ONLINE", 900);
+          }
+          return;
+        }
+
+        vortex.timer -= dt;
+        vortex.strength = Math.min(1, vortex.strength + dt * 0.8);
+        if (vortex.timer <= 0) {
+          vortex.active = false;
+          vortex.strength = 0;
+          vortex.nextIn = 8 + Math.random() * 7;
+          showBanner("VORTEX FADE", 700);
+          return;
+        }
+
+        const cx = W / 2;
+        const cy = H / 2;
+        const dx = cx - puck.x;
+        const dy = cy - puck.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        if (dist < 160) {
+          const pull = vortex.strength * (0.09 + (160 - dist) / 160 * 0.12);
+          puck.vx += (dx / dist) * pull;
+          puck.vy += (dy / dist) * pull;
+          // slight swirl
+          puck.vx += (-dy / dist) * pull * 0.55;
+          puck.vy += (dx / dist) * pull * 0.55;
+        }
+      }
+
+      function updateAI(dt) {
+        if (mode !== "ai") return;
+        const predict = puck.y < H / 2 || puck.vy < 0;
+        let tx = predict ? puck.x + puck.vx * 8 : W / 2;
+        let ty = table.y + 70;
+
+        if (predict) {
+          ty = Math.min(H / 2 - MALLET_R - 12, Math.max(table.y + MALLET_R + 12, puck.y - 18));
+          // Defend goal when puck is threatening
+          if (puck.y < table.y + 140 && Math.abs(puck.x - W / 2) < GOAL_W) {
+            tx = puck.x;
+            ty = table.y + 55;
+          }
+        }
+
+        // Occasionally aim for a rift lane
+        if (predict && Math.abs(puck.vy) > 2 && Math.random() < 0.01) {
+          const lane = Math.random() > 0.5 ? table.x + 40 : table.x + table.w - 40;
+          tx = lane;
+        }
+
+        const speed = 4.2 + Math.min(2.5, Math.hypot(puck.vx, puck.vy) * 0.12);
+        rival.x += Math.max(-speed, Math.min(speed, tx - rival.x));
+        rival.y += Math.max(-speed * 0.85, Math.min(speed * 0.85, ty - rival.y));
+        clampMallet(rival, false);
+
+        // AI charge smash when close and puck moving toward them
+        const dist = Math.hypot(puck.x - rival.x, puck.y - rival.y);
+        if (dist < MALLET_R + PUCK_R + 18 && puck.vy < 0) {
+          chargeRival = Math.min(1, chargeRival + dt * 2.2);
+        } else {
+          chargeRival = Math.max(0, chargeRival - dt * 1.5);
+        }
+      }
+
+      function updatePlayerInput(dt) {
+        // Keyboard P1
+        const move = 5.2;
+        if (keys.has("a") || keys.has("arrowleft") && mode === "ai") {
+          // when vs AI, arrowleft can also move you if no conflict — keep A/D primary
+        }
+        if (keys.has("a")) you.x -= move;
+        if (keys.has("d")) you.x += move;
+        if (keys.has("w")) you.y -= move;
+        if (keys.has("s")) you.y += move;
+
+        // Pointer / mouse for P1
+        if (pointerDown || true) {
+          // soft follow pointer X always for feel; Y only in your half when pointer in canvas
+          const targetX = pointerX;
+          you.x += (targetX - you.x) * Math.min(1, 14 * dt);
+        }
+
+        if (keys.has(" ") || pointerDown) {
+          chargeYou = Math.min(1, chargeYou + dt * 1.8);
+        } else {
+          chargeYou = Math.max(0, chargeYou - dt * 1.2);
+        }
+
+        clampMallet(you, true);
+
+        // P2 keyboard
+        if (mode === "2p") {
+          if (keys.has("arrowleft")) rival.x -= move;
+          if (keys.has("arrowright")) rival.x += move;
+          if (keys.has("arrowup")) rival.y -= move;
+          if (keys.has("arrowdown")) rival.y += move;
+          if (keys.has("shift")) chargeRival = Math.min(1, chargeRival + dt * 1.8);
+          else chargeRival = Math.max(0, chargeRival - dt * 1.2);
+          clampMallet(rival, false);
+        }
+      }
+
+      function updatePhysics(dt) {
+        you.px = you.x;
+        you.py = you.y;
+        rival.px = rival.x;
+        rival.py = rival.y;
+
+        // store previous for velocity — update positions first via input, then compute vel at hit time
+        updatePlayerInput(dt);
+        updateAI(dt);
+
+        // re-capture previous after move for hit — use delta from last frame stored
+        // Actually we need px/py from before movement. Fix: save before input.
+      }
+
+      // Fixed update loop with correct previous positions
+      function tick(dt) {
+        if (bannerTimer > 0) {
+          bannerTimer -= dt * 1000;
+          if (bannerTimer <= 0) banner.classList.remove("show");
+        }
+
+        particles = particles.filter((p) => {
+          p.life -= dt * 1000;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.96;
+          p.vy *= 0.96;
+          return p.life > 0;
+        });
+
+        if (shake > 0) shake = Math.max(0, shake - dt * 18);
+
+        if (!running) {
+          draw();
+          return;
+        }
+
+        const youPrev = { x: you.x, y: you.y };
+        const rivalPrev = { x: rival.x, y: rival.y };
+
+        updatePlayerInput(dt);
+        updateAI(dt);
+
+        you.px = youPrev.x;
+        you.py = youPrev.y;
+        rival.px = rivalPrev.x;
+        rival.py = rivalPrev.y;
+
+        puck.vx *= FRICTION;
+        puck.vy *= FRICTION;
+        puck.x += puck.vx;
+        puck.y += puck.vy;
+
+        updateVortex(dt);
+        updateRifts(dt);
+
+        // Walls (not goals)
+        const left = table.x + PUCK_R;
+        const right = table.x + table.w - PUCK_R;
+        const top = table.y + PUCK_R;
+        const bottom = table.y + table.h - PUCK_R;
+        const goalLeft = W / 2 - GOAL_W / 2;
+        const goalRight = W / 2 + GOAL_W / 2;
+
+        if (puck.x < left) {
+          puck.x = left;
+          puck.vx = Math.abs(puck.vx) * WALL_BOUNCE;
+        } else if (puck.x > right) {
+          puck.x = right;
+          puck.vx = -Math.abs(puck.vx) * WALL_BOUNCE;
+        }
+
+        // Top wall / goal
+        if (puck.y < top) {
+          if (puck.x > goalLeft && puck.x < goalRight) {
+            spawnBurst(puck.x, table.y, "#f5b942", 28);
+            endPoint("you");
+            draw();
+            return;
+          }
+          puck.y = top;
+          puck.vy = Math.abs(puck.vy) * WALL_BOUNCE;
+        }
+
+        // Bottom wall / goal
+        if (puck.y > bottom) {
+          if (puck.x > goalLeft && puck.x < goalRight) {
+            spawnBurst(puck.x, table.y + table.h, "#3de0c5", 28);
+            endPoint("rival");
+            draw();
+            return;
+          }
+          puck.y = bottom;
+          puck.vy = -Math.abs(puck.vy) * WALL_BOUNCE;
+        }
+
+        hitMallet(you, chargeYou);
+        hitMallet(rival, chargeRival);
+
+        // Cap speed
+        const sp = Math.hypot(puck.vx, puck.vy);
+        if (sp > MAX_SPEED) {
+          puck.vx = (puck.vx / sp) * MAX_SPEED;
+          puck.vy = (puck.vy / sp) * MAX_SPEED;
+        }
+        if (sp < 0.04) {
+          puck.vx *= 0.5;
+          puck.vy *= 0.5;
+        }
+
+        trail.push({ x: puck.x, y: puck.y, life: 1 });
+        if (trail.length > 14) trail.shift();
+        for (const t of trail) t.life *= 0.88;
+
+        draw();
+      }
+
+      function drawTable() {
+        // Board wood
+        const g = ctx.createLinearGradient(table.x, table.y, table.x + table.w, table.y + table.h);
+        g.addColorStop(0, "#1f3d34");
+        g.addColorStop(0.5, "#173029");
+        g.addColorStop(1, "#1a3830");
+        ctx.fillStyle = g;
+        roundRect(table.x, table.y, table.w, table.h, 18);
+        ctx.fill();
+
+        // Grain lines
+        ctx.strokeStyle = "rgba(232,240,233,0.04)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 12; i++) {
+          const y = table.y + 20 + i * ((table.h - 40) / 11);
+          ctx.beginPath();
+          ctx.moveTo(table.x + 12, y);
+          ctx.lineTo(table.x + table.w - 12, y);
+          ctx.stroke();
+        }
+
+        // Center line + circle
+        ctx.strokeStyle = "rgba(232,240,233,0.22)";
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        ctx.moveTo(table.x + 16, H / 2);
+        ctx.lineTo(table.x + table.w - 16, H / 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(W / 2, H / 2, 42, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Fracture cracks (decorative twist)
+        ctx.strokeStyle = "rgba(124,240,255,0.22)";
+        ctx.lineWidth = 1.5;
+        drawCrack(W / 2 - 40, H / 2 - 90, W / 2 + 55, H / 2 - 20);
+        drawCrack(W / 2 + 30, H / 2 + 30, W / 2 - 60, H / 2 + 100);
+        drawCrack(table.x + 50, H / 2 - 40, table.x + 110, H / 2 + 30);
+
+        // Goals
+        drawGoal(W / 2, table.y, true);
+        drawGoal(W / 2, table.y + table.h, false);
+
+        // Rifts
+        for (const r of rifts) drawRift(r);
+
+        // Vortex
+        if (vortex.active || vortex.strength > 0) {
+          const pulse = 0.45 + vortex.strength * 0.55;
+          const rad = 28 + Math.sin(performance.now() / 180) * 6;
+          const vg = ctx.createRadialGradient(W / 2, H / 2, 4, W / 2, H / 2, rad * 2.2);
+          vg.addColorStop(0, `rgba(245,185,66,${0.35 * pulse})`);
+          vg.addColorStop(0.45, `rgba(61,224,197,${0.18 * pulse})`);
+          vg.addColorStop(1, "rgba(61,224,197,0)");
+          ctx.fillStyle = vg;
+          ctx.beginPath();
+          ctx.arc(W / 2, H / 2, rad * 2.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.save();
+          ctx.translate(W / 2, H / 2);
+          ctx.rotate(performance.now() / 400);
+          ctx.strokeStyle = `rgba(245,185,66,${0.55 * pulse})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < 3; i++) {
+            const a = (i / 3) * Math.PI * 2;
+            ctx.moveTo(Math.cos(a) * 8, Math.sin(a) * 8);
+            ctx.quadraticCurveTo(
+              Math.cos(a + 0.8) * rad,
+              Math.sin(a + 0.8) * rad,
+              Math.cos(a + 1.6) * rad * 1.3,
+              Math.sin(a + 1.6) * rad * 1.3
+            );
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      function drawCrack(x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        const mx = (x1 + x2) / 2 + (Math.random() * 0 - 0);
+        const my = (y1 + y2) / 2;
+        ctx.lineTo(mx + 12, my - 8);
+        ctx.lineTo(mx - 6, my + 10);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      function drawGoal(cx, cy, top) {
+        const hw = GOAL_W / 2;
+        ctx.fillStyle = "rgba(10,18,24,0.85)";
+        ctx.fillRect(cx - hw, top ? cy - 10 : cy - 6, GOAL_W, 16);
+        ctx.strokeStyle = top ? "#f5b942" : "#3de0c5";
+        ctx.lineWidth = 3;
+        ctx.shadowColor = top ? "rgba(245,185,66,0.55)" : "rgba(61,224,197,0.55)";
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.moveTo(cx - hw, cy);
+        ctx.lineTo(cx + hw, cy);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Posts
+        ctx.fillStyle = top ? "#f5b942" : "#3de0c5";
+        ctx.fillRect(cx - hw - 3, top ? cy : cy - 14, 6, 14);
+        ctx.fillRect(cx + hw - 3, top ? cy : cy - 14, 6, 14);
+      }
+
+      function drawRift(r) {
+        const x = r.side === "left" ? table.x : table.x + table.w;
+        const ready = r.cooldown <= 0;
+        const glow = ready ? 0.85 : 0.25;
+        const grd = ctx.createRadialGradient(x, r.y, 2, x, r.y, 36);
+        grd.addColorStop(0, `rgba(124,240,255,${0.55 * glow})`);
+        grd.addColorStop(1, "rgba(124,240,255,0)");
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(x, r.y, 36, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(x, r.y);
+        ctx.rotate(performance.now() / 500 * (r.side === "left" ? 1 : -1));
+        ctx.strokeStyle = `rgba(124,240,255,${0.7 * glow})`;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 7, r.h / 2.4, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawMallet(m, color, charge) {
+        // Charge ring
+        if (charge > 0.05) {
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, MALLET_R + 6 + charge * 8, 0, Math.PI * 2 * charge);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 3;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 10;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+
+        const grd = ctx.createRadialGradient(m.x - 5, m.y - 5, 4, m.x, m.y, MALLET_R);
+        grd.addColorStop(0, "#ffffff");
+        grd.addColorStop(0.25, color);
+        grd.addColorStop(1, "#14201c");
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, MALLET_R, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(232,240,233,0.35)";
+        ctx.stroke();
+
+        // Stick knob mark
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(10,18,24,0.55)";
+        ctx.fill();
+      }
+
+      function drawPuck() {
+        for (let i = 0; i < trail.length; i++) {
+          const t = trail[i];
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, PUCK_R * (0.35 + t.life * 0.4), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(124,240,255,${0.15 * t.life})`;
+          ctx.fill();
+        }
+
+        ctx.beginPath();
+        ctx.arc(puck.x, puck.y, PUCK_R + 3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245,185,66,0.2)";
+        ctx.fill();
+
+        const grd = ctx.createRadialGradient(puck.x - 3, puck.y - 3, 2, puck.x, puck.y, PUCK_R);
+        grd.addColorStop(0, "#fff6d6");
+        grd.addColorStop(0.4, "#f5b942");
+        grd.addColorStop(1, "#8a4f10");
+        ctx.beginPath();
+        ctx.arc(puck.x, puck.y, PUCK_R, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,0.35)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      function drawParticles() {
+        for (const p of particles) {
+          ctx.globalAlpha = Math.max(0, p.life / 500);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+
+      function draw() {
+        ctx.save();
+        if (shake > 0) {
+          ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+        }
+
+        ctx.clearRect(-10, -10, W + 20, H + 20);
+
+        // Outer frame
+        ctx.fillStyle = "#0b1613";
+        roundRect(10, 20, W - 20, H - 40, 22);
+        ctx.fill();
+
+        drawTable();
+        drawMallet(rival, "#3de0c5", chargeRival);
+        drawMallet(you, "#f5b942", chargeYou);
+        drawPuck();
+        drawParticles();
+
+        // Corner labels
+        ctx.fillStyle = "rgba(232,240,233,0.35)";
+        ctx.font = "600 11px Space Grotesk, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(mode === "2p" ? "P2" : "AI", W / 2, table.y - 18);
+        ctx.fillText(mode === "2p" ? "P1" : "YOU", W / 2, table.y + table.h + 28);
+
+        ctx.restore();
+      }
+
+      function loop(ts) {
+        if (!lastTs) lastTs = ts;
+        let dt = (ts - lastTs) / 1000;
+        lastTs = ts;
+        dt = Math.min(0.033, dt);
+        tick(dt);
+        requestAnimationFrame(loop);
+      }
+
+      // Input
+      window.addEventListener("keydown", (e) => {
+        keys.add(e.key.toLowerCase());
+        if ([" ", "arrowup", "arrowdown"].includes(e.key.toLowerCase()) || e.key === " ") {
+          e.preventDefault();
+        }
+      });
+      window.addEventListener("keyup", (e) => {
+        keys.delete(e.key.toLowerCase());
+      });
+
+      function canvasPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: ((clientX - rect.left) / rect.width) * W,
+          y: ((clientY - rect.top) / rect.height) * H,
+        };
+      }
+
+      canvas.addEventListener("pointerdown", (e) => {
+        pointerDown = true;
+        const p = canvasPos(e);
+        pointerX = p.x;
+        if (running && p.y > H / 2) {
+          you.x = p.x;
+          you.y = p.y;
+          clampMallet(you, true);
+        }
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener("pointermove", (e) => {
+        const p = canvasPos(e);
+        pointerX = p.x;
+        if (pointerDown && running) {
+          you.x = p.x;
+          you.y = Math.max(H / 2 + MALLET_R, p.y);
+          clampMallet(you, true);
+        }
+      });
+      canvas.addEventListener("pointerup", () => {
+        pointerDown = false;
+      });
+      canvas.addEventListener("pointercancel", () => {
+        pointerDown = false;
+      });
+
+      document.getElementById("btn-ai").addEventListener("click", () => startMatch("ai"));
+      document.getElementById("btn-2p").addEventListener("click", () => startMatch("2p"));
+      document.getElementById("btn-next").addEventListener("click", () => {
+        goalOverlay.classList.add("hidden");
+        resetMallets();
+        resetPuck(Math.random() > 0.5);
+        running = true;
+        waitingFaceoff = false;
+        showBanner("FACEOFF", 700);
+      });
+      document.getElementById("btn-rematch").addEventListener("click", () => startMatch(mode));
+      document.getElementById("btn-menu").addEventListener("click", () => {
+        winOverlay.classList.add("hidden");
+        menu.classList.remove("hidden");
+        running = false;
+      });
+
+      // Idle draw
+      resetMallets();
+      resetPuck();
+      draw();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
