@@ -54,6 +54,22 @@
       padding: 1.25rem 1rem 2.5rem;
     }
 
+    .hub-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-bottom: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: color 0.15s;
+    }
+
+    .hub-link:hover { color: var(--amber); }
+
     header {
       text-align: center;
       margin-bottom: 1rem;
@@ -263,6 +279,7 @@
 </head>
 <body>
   <div class="wrap">
+    <a class="hub-link" href="index.html">← Challenge Games</a>
     <header>
       <div class="brand">RIFT HOCKEY</div>
       <p class="tag">Knock hockey — but the table is tearing open</p>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Challenge Games — Play Hub</title>
+  <meta name="description" content="A hub for Rift Hockey, Night Sprint racing, and Curveball Hangman — open a game and play in your browser." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #08110e;
+      --chalk: #e8f0e9;
+      --amber: #f5b942;
+      --cyan: #3de0c5;
+      --green: #3dd68c;
+      --muted: #8aa899;
+      --glass: rgba(232, 240, 233, 0.08);
+      --line: rgba(232, 240, 233, 0.16);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--chalk);
+      background:
+        radial-gradient(ellipse 100% 70% at 50% -20%, rgba(245, 185, 66, 0.2), transparent 55%),
+        radial-gradient(ellipse 60% 50% at 0% 40%, rgba(61, 224, 197, 0.1), transparent 50%),
+        radial-gradient(ellipse 55% 45% at 100% 70%, rgba(61, 214, 140, 0.08), transparent 50%),
+        linear-gradient(170deg, #050c0a 0%, var(--ink) 42%, #0d1c16 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 47px, rgba(232, 240, 233, 0.028) 47px, rgba(232, 240, 233, 0.028) 48px),
+        repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(232, 240, 233, 0.028) 47px, rgba(232, 240, 233, 0.028) 48px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 3.5rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 1.5rem 0 2.25rem;
+      animation: rise 0.7s ease-out both;
+    }
+
+    .brand {
+      font-family: "Archivo Black", sans-serif;
+      font-size: clamp(3rem, 12vw, 5.2rem);
+      letter-spacing: 0.03em;
+      line-height: 0.92;
+      background: linear-gradient(180deg, #fff 12%, var(--amber) 55%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lede {
+      margin: 1rem auto 0;
+      max-width: 34rem;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.6vw, 1.15rem);
+      line-height: 1.55;
+      font-weight: 500;
+    }
+
+    .games {
+      display: grid;
+      gap: 1.1rem;
+      grid-template-columns: 1fr;
+      animation: rise 0.7s ease-out 0.1s both;
+    }
+
+    @media (min-width: 740px) {
+      .games { grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
+    }
+
+    .game {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--glass);
+      overflow: hidden;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      min-height: 100%;
+    }
+
+    .game:hover,
+    .game:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(245, 185, 66, 0.45);
+      background: rgba(232, 240, 233, 0.11);
+      outline: none;
+    }
+
+    .preview {
+      position: relative;
+      height: 148px;
+      overflow: hidden;
+    }
+
+    .preview::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(8, 17, 14, 0.55) 100%);
+    }
+
+    .preview-hockey {
+      background:
+        radial-gradient(circle at 30% 40%, rgba(124, 240, 255, 0.35), transparent 35%),
+        radial-gradient(circle at 70% 60%, rgba(245, 185, 66, 0.25), transparent 30%),
+        linear-gradient(145deg, #12352c, #1a2e40 55%, #0d1a16);
+    }
+
+    .preview-race {
+      background:
+        repeating-linear-gradient(90deg, transparent 0 34px, rgba(232, 240, 233, 0.08) 34px 36px),
+        linear-gradient(180deg, #243044 0%, #121820 60%, #0a1018 100%);
+    }
+
+    .preview-race::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 28px;
+      width: 34px;
+      height: 52px;
+      transform: translateX(-50%);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #ffe08a, #f5b942);
+      box-shadow: 0 8px 20px rgba(245, 185, 66, 0.35);
+      z-index: 1;
+    }
+
+    .preview-hangman {
+      background:
+        radial-gradient(circle at 50% 30%, rgba(245, 185, 66, 0.2), transparent 40%),
+        linear-gradient(160deg, #163d30, #0f2a21 70%, #0b1a14);
+    }
+
+    .preview-mark {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: 0.06em;
+      color: rgba(232, 240, 233, 0.22);
+      z-index: 1;
+    }
+
+    .preview-hockey .preview-mark { color: rgba(124, 240, 255, 0.28); }
+    .preview-race .preview-mark { color: rgba(245, 185, 66, 0.22); }
+    .preview-hangman .preview-mark { color: rgba(61, 214, 140, 0.28); }
+
+    .body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      padding: 1.15rem 1.15rem 1.25rem;
+      flex: 1;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .title {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+      flex: 1;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+      align-self: flex-start;
+      font-weight: 700;
+      font-size: 0.88rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    .game:hover .cta { color: #ffe08a; }
+
+    .foot {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      animation: rise 0.7s ease-out 0.18s both;
+    }
+
+    .foot code {
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--cyan);
+      font-size: 0.9em;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero, .games, .foot, .game { animation: none; transition: none; }
+      .game:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <h1 class="brand">CHALLENGE GAMES</h1>
+      <p class="lede">Three browser games. Pick one and play — no install, no build step.</p>
+    </header>
+
+    <section class="games" aria-label="Game catalog">
+      <a class="game" href="rifthockey.html">
+        <div class="preview preview-hockey" aria-hidden="true">
+          <span class="preview-mark">RH</span>
+        </div>
+        <div class="body">
+          <span class="eyebrow">Knock hockey</span>
+          <h2 class="title">Rift Hockey</h2>
+          <p class="desc">Table hockey with side rifts that teleport the puck and a center vortex that yanks mid-rally. Solo vs AI or local two-player.</p>
+          <span class="cta">Play now →</span>
+        </div>
+      </a>
+
+      <a class="game" href="racing.html">
+        <div class="preview preview-race" aria-hidden="true">
+          <span class="preview-mark">NS</span>
+        </div>
+        <div class="body">
+          <span class="eyebrow">Racing</span>
+          <h2 class="title">Night Sprint</h2>
+          <p class="desc">Lane-dodge racer under city lights. Weave through traffic, push the multiplier, and beat your best distance.</p>
+          <span class="cta">Play now →</span>
+        </div>
+      </a>
+
+      <a class="game" href="hangman.html">
+        <div class="preview preview-hangman" aria-hidden="true">
+          <span class="preview-mark">CB</span>
+        </div>
+        <div class="body">
+          <span class="eyebrow">Hangman</span>
+          <h2 class="title">Curveball</h2>
+          <p class="desc">Guess sports, movies, and fun stuff before six strikes. Throw one curveball per round to reveal a hidden letter.</p>
+          <span class="cta">Play now →</span>
+        </div>
+      </a>
+    </section>
+
+    <p class="foot">Open <code>index.html</code> locally, or serve this folder with any static file server.</p>
+  </main>
+</body>
+</html>
