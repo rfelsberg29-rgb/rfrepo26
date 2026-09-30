@@ -25,15 +25,16 @@ Open [`rifthockey.html`](./rifthockey.html).
 - **Player 2 (top):** `←` `→` · smash with `Shift`
 - First to **5** wins
 
-### Night Sprint — Racing
-Lane-dodge racer: weave through traffic, build speed, beat your best distance.
+### Street Racing
+Top-down circuit race: drift, grab items, and dive through a moving rift shortcut. Last place gets the longest jump.
 
-Open [`racing.html`](./racing.html).
+Open [`street-racing/`](./street-racing/).
 
 **Controls**
-- Desktop: `←` `→` or `A` `D`
-- Mobile: on-screen pads
-- Crash ends the run — score is distance driven
+- `W` `A` `S` `D` or arrows — drive
+- `Shift` — drift (hold to charge a boost)
+- `Space` — use item
+- `P` / `Esc` — pause · `M` — mute · `R` — restart
 
 ### Curveball — Hangman
 Hangman with a sports twist. Guess letters across **Sports**, **Movies**, and **Fun Stuff** before you rack up six strikes.
@@ -53,7 +54,7 @@ Open [`hangman.html`](./hangman.html).
 |------|------------|
 | `index.html` | Challenge Games hub / catalog |
 | `rifthockey.html` | Rift Hockey (HTML + CSS + JavaScript) |
-| `racing.html` | Night Sprint racing (HTML + CSS + JavaScript) |
+| `street-racing/` | Street Racing (HTML + CSS + JavaScript) |
 | `hangman.html` | Curveball Hangman (HTML + CSS + JavaScript) |
 | `LICENSE` | MIT |
 
