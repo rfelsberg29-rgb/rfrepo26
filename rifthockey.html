@@ -332,7 +332,7 @@
     </div>
 
     <div class="help">
-      <strong>You (bottom):</strong> move with mouse / touch, or <strong>A D</strong> · charge smash with <strong>click / Space</strong><br />
+      <strong>You (bottom):</strong> move with mouse / trackpad / touch (hover or drag), or <strong>A D W S</strong> · charge smash with <strong>click / Space</strong><br />
       <strong>Player 2 (top):</strong> <strong>← →</strong> move · <strong>Shift</strong> smash<br />
       <strong>Twist:</strong> shoot into the glowing side rifts to warp — watch the vortex when it wakes up.
     </div>
@@ -371,7 +371,12 @@
       let bannerTimer = 0;
       let lastTs = 0;
       let pointerDown = false;
+      let pointerActive = false;
       let pointerX = W / 2;
+      let pointerY = H * 0.78;
+      // Snappy follow with light smoothing + tiny deadzone for trackpad jitter
+      const POINTER_FOLLOW = 42;
+      const POINTER_DEADZONE = 1.35;
       let chargeYou = 0;
       let chargeRival = 0;
       let vortex = { active: false, strength: 0, timer: 0, nextIn: 8 };
@@ -634,19 +639,30 @@
       function updatePlayerInput(dt) {
         // Keyboard P1
         const move = 5.2;
-        if (keys.has("a") || keys.has("arrowleft") && mode === "ai") {
-          // when vs AI, arrowleft can also move you if no conflict — keep A/D primary
-        }
+        const usingKeys =
+          keys.has("a") || keys.has("d") || keys.has("w") || keys.has("s");
+
         if (keys.has("a")) you.x -= move;
         if (keys.has("d")) you.x += move;
         if (keys.has("w")) you.y -= move;
         if (keys.has("s")) you.y += move;
 
-        // Pointer / mouse for P1
-        if (pointerDown || true) {
-          // soft follow pointer X always for feel; Y only in your half when pointer in canvas
+        // Pointer / mouse / trackpad / touch for P1 — follow in update so hit velocity stays correct
+        if (pointerActive && !usingKeys) {
+          const minY = H / 2 + MALLET_R + 8;
+          const maxY = table.y + table.h - MALLET_R - 8;
           const targetX = pointerX;
-          you.x += (targetX - you.x) * Math.min(1, 14 * dt);
+          const targetY = Math.max(minY, Math.min(maxY, pointerY));
+          const dx = targetX - you.x;
+          const dy = targetY - you.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist > POINTER_DEADZONE) {
+            // Near-direct tracking; slightly smoother when very close, faster catch-up when far
+            const rate = POINTER_FOLLOW + Math.min(50, dist * 0.55);
+            const t = Math.min(1, rate * dt);
+            you.x += dx * t;
+            you.y += dy * t;
+          }
         }
 
         if (keys.has(" ") || pointerDown) {
@@ -1052,39 +1068,65 @@
 
       function canvasPos(e) {
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const src = e.touches && e.touches[0] ? e.touches[0] : e;
+        const clientX = src.clientX;
+        const clientY = src.clientY;
         return {
           x: ((clientX - rect.left) / rect.width) * W,
           y: ((clientY - rect.top) / rect.height) * H,
         };
       }
 
+      function setPointerTarget(e) {
+        const p = canvasPos(e);
+        pointerX = p.x;
+        pointerY = p.y;
+        pointerActive = true;
+        return p;
+      }
+
       canvas.addEventListener("pointerdown", (e) => {
         pointerDown = true;
-        const p = canvasPos(e);
-        pointerX = p.x;
-        if (running && p.y > H / 2) {
+        const p = setPointerTarget(e);
+        if (running) {
+          // Immediate snap on press so smash aim feels direct
           you.x = p.x;
-          you.y = p.y;
+          you.y = Math.max(H / 2 + MALLET_R + 8, Math.min(table.y + table.h - MALLET_R - 8, p.y));
           clampMallet(you, true);
         }
-        canvas.setPointerCapture(e.pointerId);
+        try {
+          canvas.setPointerCapture(e.pointerId);
+        } catch (_) {
+          /* ignore */
+        }
+        e.preventDefault();
       });
       canvas.addEventListener("pointermove", (e) => {
-        const p = canvasPos(e);
-        pointerX = p.x;
-        if (pointerDown && running) {
-          you.x = p.x;
-          you.y = Math.max(H / 2 + MALLET_R, p.y);
-          clampMallet(you, true);
-        }
+        setPointerTarget(e);
       });
-      canvas.addEventListener("pointerup", () => {
+      canvas.addEventListener("pointerup", (e) => {
         pointerDown = false;
+        // Keep hover control while cursor remains over the canvas
+        const rect = canvas.getBoundingClientRect();
+        const inside =
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom;
+        pointerActive = inside;
       });
       canvas.addEventListener("pointercancel", () => {
         pointerDown = false;
+        pointerActive = false;
+      });
+      canvas.addEventListener("pointerenter", (e) => {
+        setPointerTarget(e);
+      });
+      canvas.addEventListener("pointerleave", () => {
+        if (!pointerDown) pointerActive = false;
+      });
+      canvas.addEventListener("lostpointercapture", () => {
+        if (!pointerDown) pointerActive = false;
       });
 
       document.getElementById("btn-ai").addEventListener("click", () => startMatch("ai"));
