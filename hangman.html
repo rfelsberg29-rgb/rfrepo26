@@ -662,6 +662,37 @@
         return lettersLeft().length === 0;
       }
 
+      /** Hub daily challenge: save fewest strikes on a win for today's Curveball day. */
+      function recordDailyCurveball(strikes) {
+        try {
+          const now = new Date();
+          const dateKey =
+            now.getFullYear() +
+            "-" +
+            String(now.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(now.getDate()).padStart(2, "0");
+          const storageKey = "cg-daily-" + dateKey;
+          const epochDay = Math.floor(
+            Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000
+          );
+          const rotation = ["rift-hockey", "street-racing", "curveball"];
+          if (rotation[((epochDay % 3) + 3) % 3] !== "curveball") return;
+          if (strikes > 3) return;
+          let record = { gameId: "curveball", best: null };
+          try {
+            const raw = localStorage.getItem(storageKey);
+            if (raw) record = Object.assign(record, JSON.parse(raw));
+          } catch (_) {}
+          if (record.gameId !== "curveball") record = { gameId: "curveball", best: null };
+          if (record.best == null || strikes < record.best) {
+            record.best = strikes;
+            record.updatedAt = now.toISOString();
+            localStorage.setItem(storageKey, JSON.stringify(record));
+          }
+        } catch (_) {}
+      }
+
       function endGame(won) {
         state.over = true;
         els.curveBtn.disabled = true;
@@ -674,6 +705,7 @@
           els.banner.textContent = "SAFE! You connected.";
           els.modalTitle.textContent = "Home Run!";
           els.modalText.textContent = "You guessed it before the sixth strike.";
+          recordDailyCurveball(state.strikes);
         } else {
           state.streak = 0;
           els.banner.className = "banner lose";

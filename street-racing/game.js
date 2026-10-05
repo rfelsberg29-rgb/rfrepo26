@@ -162,6 +162,37 @@ function wrapAngle(a) {
 function placeLabel(i) {
   return ["1st", "2nd", "3rd", "4th"][i] || `${i + 1}th`;
 }
+
+/** Hub daily challenge: save best finishing place for today's Street Racing day. */
+function recordDailyRacingPlace(place) {
+  try {
+    const now = new Date();
+    const dateKey =
+      now.getFullYear() +
+      "-" +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(now.getDate()).padStart(2, "0");
+    const storageKey = "cg-daily-" + dateKey;
+    const epochDay = Math.floor(
+      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000
+    );
+    const rotation = ["rift-hockey", "street-racing", "curveball"];
+    if (rotation[((epochDay % 3) + 3) % 3] !== "street-racing") return;
+    let record = { gameId: "street-racing", best: null };
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) record = Object.assign(record, JSON.parse(raw));
+    } catch (_) {}
+    if (record.gameId !== "street-racing") record = { gameId: "street-racing", best: null };
+    if (record.best == null || place < record.best) {
+      record.best = place;
+      record.updatedAt = now.toISOString();
+      localStorage.setItem(storageKey, JSON.stringify(record));
+    }
+  } catch (_) {}
+}
+
 function formatTime(t) {
   const m = Math.floor(t / 60);
   const s = Math.floor(t % 60);
@@ -1953,6 +1984,7 @@ function syncUI() {
     ui.resultList.innerHTML = resultSnap.map((r) =>
       `<li class="${r.player ? "me" : ""}"><span>${placeLabel(r.place)}  ${r.name}</span><span>${r.finished ? formatTime(r.finishTime) : "out on track"}</span></li>`
     ).join("");
+    if (mine && typeof mine.place === "number") recordDailyRacingPlace(mine.place);
   }
   if (state !== "results") delete ui.results.dataset.filled;
 }
