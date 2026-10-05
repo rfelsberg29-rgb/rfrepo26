@@ -367,6 +367,34 @@
       const rivalLabel = document.getElementById("rival-label");
 
       const TO_WIN = 5;
+
+      /** Hub daily challenge: count AI wins for today's Rift Hockey day. */
+      function recordDailyHockeyWin() {
+        try {
+          const now = new Date();
+          const dateKey =
+            now.getFullYear() +
+            "-" +
+            String(now.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(now.getDate()).padStart(2, "0");
+          const storageKey = "cg-daily-" + dateKey;
+          const epochDay = Math.floor(
+            Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000
+          );
+          const rotation = ["rift-hockey", "street-racing", "curveball"];
+          if (rotation[((epochDay % 3) + 3) % 3] !== "rift-hockey") return;
+          let record = { gameId: "rift-hockey", best: 0 };
+          try {
+            const raw = localStorage.getItem(storageKey);
+            if (raw) record = Object.assign(record, JSON.parse(raw));
+          } catch (_) {}
+          if (record.gameId !== "rift-hockey") record = { gameId: "rift-hockey", best: 0 };
+          record.best = (Number(record.best) || 0) + 1;
+          record.updatedAt = now.toISOString();
+          localStorage.setItem(storageKey, JSON.stringify(record));
+        } catch (_) {}
+      }
       const FRICTION = 0.988;
       const WALL_BOUNCE = 0.92;
       const PUCK_R = 11;
@@ -471,6 +499,7 @@
             ? "You bent the table to your will."
             : "The rifts claimed this match.";
           winOverlay.classList.remove("hidden");
+          if (youWon && mode === "ai") recordDailyHockeyWin();
           return;
         }
 

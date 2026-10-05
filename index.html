@@ -7,7 +7,7 @@
   <meta name="description" content="A student game collection hub for Rift Hockey, Street Racing, and Curveball — open a game and play in your browser." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #0b0b0b;
@@ -18,6 +18,7 @@
       --dim: #6e6e6e;
       --line: rgba(255, 255, 255, 0.08);
       --line-soft: rgba(255, 255, 255, 0.05);
+      --accent-soft: rgba(255, 255, 255, 0.06);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,6 +38,7 @@
       background-attachment: fixed;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      transition: background 0.35s ease, color 0.35s ease;
     }
 
     .page {
@@ -66,6 +68,14 @@
       letter-spacing: -0.035em;
       line-height: 1.05;
       color: var(--text);
+      cursor: default;
+      user-select: none;
+    }
+
+    .brand:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(255, 255, 255, 0.35);
+      border-radius: 4px;
     }
 
     .lede {
@@ -75,6 +85,59 @@
       font-size: clamp(1rem, 2.2vw, 1.1rem);
       line-height: 1.65;
       font-weight: 300;
+    }
+
+    .daily-chip {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.35rem;
+      margin-top: 1.75rem;
+      max-width: 22rem;
+      padding: 0.9rem 1rem;
+      text-decoration: none;
+      color: inherit;
+      background: var(--accent-soft);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .daily-chip:hover,
+    .daily-chip:focus-visible {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.16);
+      outline: none;
+    }
+
+    .daily-chip:focus-visible {
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(255, 255, 255, 0.35);
+    }
+
+    .daily-chip .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 500;
+    }
+
+    .daily-chip .goal {
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .daily-chip .goal strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .daily-chip .best {
+      font-size: 0.8rem;
+      color: var(--dim);
+      font-weight: 400;
     }
 
     .scroll-cta {
@@ -151,6 +214,87 @@
       line-height: 1.5;
     }
 
+    .daily-panel {
+      margin-bottom: 2rem;
+      padding: 1.15rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+    }
+
+    .daily-panel .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem 1.5rem;
+    }
+
+    .daily-panel .kicker {
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 500;
+    }
+
+    .daily-panel h3 {
+      margin-top: 0.35rem;
+      font-size: 1.15rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .daily-panel .blurb {
+      margin-top: 0.4rem;
+      max-width: 28rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .daily-panel .score-line {
+      margin-top: 0.65rem;
+      font-size: 0.85rem;
+      color: var(--dim);
+    }
+
+    .daily-panel .score-line span {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .daily-play {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      align-self: center;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.88rem;
+      padding: 0.65rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      transition: background 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .daily-play:hover,
+    .daily-play:focus-visible {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.32);
+      outline: none;
+    }
+
+    .daily-play:focus-visible {
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(255, 255, 255, 0.35);
+    }
+
     .games {
       display: grid;
       gap: 1.15rem;
@@ -173,6 +317,7 @@
       overflow: hidden;
       transition: background 0.2s ease, border-color 0.2s ease;
       min-height: 100%;
+      position: relative;
     }
 
     .game:hover,
@@ -184,6 +329,31 @@
 
     .game:focus-visible {
       box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(255, 255, 255, 0.35);
+    }
+
+    .game.is-daily {
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .game .today-badge {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      z-index: 2;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      padding: 0.25rem 0.45rem;
+      display: none;
+    }
+
+    .game.is-daily .today-badge {
+      display: inline-block;
     }
 
     .preview {
@@ -305,6 +475,94 @@
       font-weight: 400;
     }
 
+    /* —— Retro terminal easter egg —— */
+    body.terminal-mode {
+      --bg: #020802;
+      --surface: #041204;
+      --surface-2: #071a07;
+      --text: #39ff14;
+      --muted: #2ec20a;
+      --dim: #1f8a08;
+      --line: rgba(57, 255, 20, 0.28);
+      --line-soft: rgba(57, 255, 20, 0.12);
+      --accent-soft: rgba(57, 255, 20, 0.06);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent 0 2px,
+          rgba(0, 0, 0, 0.12) 2px 3px
+        ),
+        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(57, 255, 20, 0.08), transparent 55%),
+        #020802;
+    }
+
+    body.terminal-mode .brand,
+    body.terminal-mode .catalog-head h2,
+    body.terminal-mode .title,
+    body.terminal-mode .daily-panel h3 {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      letter-spacing: -0.01em;
+      text-shadow: 0 0 12px rgba(57, 255, 20, 0.25);
+    }
+
+    body.terminal-mode .preview-emoji {
+      border-radius: 2px;
+      border-color: rgba(57, 255, 20, 0.35);
+      background: rgba(57, 255, 20, 0.05);
+      filter: grayscale(1) brightness(1.35) contrast(1.1);
+    }
+
+    body.terminal-mode .game,
+    body.terminal-mode .daily-panel,
+    body.terminal-mode .daily-chip {
+      border-radius: 2px;
+      box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.08);
+    }
+
+    body.terminal-mode .scroll-arrow,
+    body.terminal-mode .daily-play {
+      border-radius: 2px;
+    }
+
+    body.terminal-mode::after {
+      content: "";
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.08) 50%
+      );
+      background-size: 100% 3px;
+      opacity: 0.35;
+      animation: crt-flicker 2.8s steps(2) infinite;
+    }
+
+    .terminal-toast {
+      position: fixed;
+      left: 1rem;
+      bottom: 1rem;
+      z-index: 50;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.78rem;
+      color: #39ff14;
+      background: rgba(0, 12, 0, 0.92);
+      border: 1px solid rgba(57, 255, 20, 0.4);
+      padding: 0.55rem 0.75rem;
+      border-radius: 2px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .terminal-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     @keyframes rise {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
@@ -315,23 +573,36 @@
       50% { transform: translateY(4px); }
     }
 
+    @keyframes crt-flicker {
+      0%, 100% { opacity: 0.28; }
+      50% { opacity: 0.4; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .overview, .catalog-head, .games, .game { animation: none; transition: none; }
+      .overview, .catalog-head, .games, .game, .daily-panel { animation: none; transition: none; }
       .scroll-arrow { animation: none; }
       .game:hover .preview-emoji,
       .game:focus-visible .preview-emoji { transform: none; }
+      body { transition: none; }
+      body.terminal-mode::after { animation: none; opacity: 0.2; }
+      .terminal-toast { transition: none; transform: none; }
     }
   </style>
 </head>
 <body>
   <main class="page">
     <header class="overview">
-      <h1 class="brand">Challenge<br />Games</h1>
+      <h1 class="brand" id="brand" tabindex="0" title="Challenge Games">Challenge<br />Games</h1>
       <p class="lede">
         A small student collection of browser games — hockey, racing, and hangman —
         built to open and play with no install and no build step.
       </p>
+      <a class="daily-chip" id="daily-chip" href="#daily">
+        <span class="label">Today’s challenge</span>
+        <span class="goal" id="daily-chip-goal">Loading…</span>
+        <span class="best" id="daily-chip-best">No attempts yet</span>
+      </a>
       <a class="scroll-cta" href="#games">
         Scroll to play
         <span class="scroll-arrow" aria-hidden="true">
@@ -348,8 +619,21 @@
         <p>Three titles. Click one and jump in.</p>
       </div>
 
+      <aside class="daily-panel" id="daily" aria-label="Daily challenge">
+        <div class="row">
+          <div>
+            <p class="kicker">Daily challenge · <span id="daily-date">—</span></p>
+            <h3 id="daily-title">—</h3>
+            <p class="blurb" id="daily-blurb">—</p>
+            <p class="score-line" id="daily-score">Best attempt: <span>none yet</span></p>
+          </div>
+          <a class="daily-play" id="daily-play" href="#">Play challenge →</a>
+        </div>
+      </aside>
+
       <div class="games">
-        <a class="game" href="rifthockey.html">
+        <a class="game" data-game="rift-hockey" href="rifthockey.html">
+          <span class="today-badge">Today</span>
           <div class="preview preview-hockey" aria-hidden="true">
             <span class="preview-emoji">🏒</span>
           </div>
@@ -361,7 +645,8 @@
           </div>
         </a>
 
-        <a class="game" href="street-racing/">
+        <a class="game" data-game="street-racing" href="street-racing/">
+          <span class="today-badge">Today</span>
           <div class="preview preview-race" aria-hidden="true">
             <span class="preview-emoji">🏎️</span>
           </div>
@@ -373,7 +658,8 @@
           </div>
         </a>
 
-        <a class="game" href="hangman.html">
+        <a class="game" data-game="curveball" href="hangman.html">
+          <span class="today-badge">Today</span>
           <div class="preview preview-hangman" aria-hidden="true">
             <span class="preview-emoji">⚾</span>
           </div>
@@ -389,5 +675,177 @@
       <p class="foot">Open <code>index.html</code> locally, or serve this folder with any static file server.</p>
     </section>
   </main>
+
+  <div class="terminal-toast" id="terminal-toast" role="status" aria-live="polite">TERMINAL MODE // 10s</div>
+
+  <script>
+    (function () {
+      var CHALLENGES = [
+        {
+          id: "rift-hockey",
+          name: "Rift Hockey",
+          href: "rifthockey.html",
+          emoji: "🏒",
+          goal: "Beat the AI — first to 5 goals.",
+          tip: "Solo vs AI only. Wins today count toward your best."
+        },
+        {
+          id: "street-racing",
+          name: "Street Racing",
+          href: "street-racing/",
+          emoji: "🏎️",
+          goal: "Finish 1st on the circuit.",
+          tip: "Your best finishing place is saved for today."
+        },
+        {
+          id: "curveball",
+          name: "Curveball",
+          href: "hangman.html",
+          emoji: "⚾",
+          goal: "Solve a word with 3 or fewer strikes.",
+          tip: "Wins with few strikes update your best attempt."
+        }
+      ];
+
+      var STORAGE_PREFIX = "cg-daily-";
+
+      function localDateKey(d) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var day = String(d.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + day;
+      }
+
+      function challengeForDate(d) {
+        var epochDay = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+        return CHALLENGES[((epochDay % CHALLENGES.length) + CHALLENGES.length) % CHALLENGES.length];
+      }
+
+      function readRecord(dateKey) {
+        try {
+          var raw = localStorage.getItem(STORAGE_PREFIX + dateKey);
+          if (!raw) return null;
+          return JSON.parse(raw);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function formatBest(challenge, record) {
+        if (!record || record.gameId !== challenge.id || record.best == null) {
+          return "none yet";
+        }
+        if (challenge.id === "rift-hockey") {
+          return record.best + (record.best === 1 ? " win" : " wins");
+        }
+        if (challenge.id === "street-racing") {
+          var places = ["1st", "2nd", "3rd", "4th"];
+          return places[record.best] || (record.best + 1 + "th");
+        }
+        if (challenge.id === "curveball") {
+          return "won with " + record.best + (record.best === 1 ? " strike" : " strikes");
+        }
+        return String(record.best);
+      }
+
+      function renderDaily() {
+        var now = new Date();
+        var dateKey = localDateKey(now);
+        var challenge = challengeForDate(now);
+        var record = readRecord(dateKey);
+        var bestText = formatBest(challenge, record);
+        var playHref = challenge.href + (challenge.href.indexOf("?") >= 0 ? "&" : "?") + "daily=1";
+
+        var prettyDate = now.toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric"
+        });
+
+        document.getElementById("daily-date").textContent = prettyDate;
+        document.getElementById("daily-title").textContent = challenge.emoji + " " + challenge.name;
+        document.getElementById("daily-blurb").textContent = challenge.goal + " " + challenge.tip;
+        document.getElementById("daily-score").innerHTML = "Best attempt: <span>" + bestText + "</span>";
+
+        var play = document.getElementById("daily-play");
+        play.href = playHref;
+        play.textContent = "Play " + challenge.name + " →";
+
+        document.getElementById("daily-chip-goal").innerHTML =
+          "Play <strong>" + challenge.name + "</strong> — " + challenge.goal;
+        document.getElementById("daily-chip-best").textContent =
+          bestText === "none yet" ? "No attempts yet · saved on this device" : "Best: " + bestText;
+        document.getElementById("daily-chip").href = "#daily";
+
+        document.querySelectorAll(".game[data-game]").forEach(function (card) {
+          var isToday = card.getAttribute("data-game") === challenge.id;
+          card.classList.toggle("is-daily", isToday);
+          if (isToday) {
+            card.href = playHref;
+          }
+        });
+      }
+
+      renderDaily();
+
+      /* —— Easter egg: logo clicks + Konami —— */
+      var KONAMI = [
+        "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
+        "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
+        "b", "a"
+      ];
+      var konamiIndex = 0;
+      var brandClicks = 0;
+      var brandTimer = null;
+      var eggTimer = null;
+      var toast = document.getElementById("terminal-toast");
+      var brand = document.getElementById("brand");
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function activateTerminal() {
+        if (document.body.classList.contains("terminal-mode")) return;
+        document.body.classList.add("terminal-mode");
+        toast.textContent = reduceMotion ? "TERMINAL MODE" : "TERMINAL MODE // 10s";
+        toast.classList.add("show");
+        clearTimeout(eggTimer);
+        eggTimer = setTimeout(function () {
+          document.body.classList.remove("terminal-mode");
+          toast.classList.remove("show");
+        }, reduceMotion ? 8000 : 10000);
+      }
+
+      brand.addEventListener("click", function () {
+        brandClicks += 1;
+        clearTimeout(brandTimer);
+        brandTimer = setTimeout(function () { brandClicks = 0; }, 900);
+        if (brandClicks >= 5) {
+          brandClicks = 0;
+          activateTerminal();
+        }
+      });
+
+      brand.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          brand.click();
+        }
+      });
+
+      window.addEventListener("keydown", function (e) {
+        var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        var expected = KONAMI[konamiIndex];
+        if (expected.length === 1) expected = expected.toLowerCase();
+        if (key === expected) {
+          konamiIndex += 1;
+          if (konamiIndex === KONAMI.length) {
+            konamiIndex = 0;
+            activateTerminal();
+          }
+        } else {
+          konamiIndex = key === KONAMI[0] ? 1 : 0;
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
