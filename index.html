@@ -683,7 +683,7 @@
       </div>
 
       <p class="foot">Open <code>index.html</code> locally, or serve this folder with any static file server.</p>
-      <p class="egg-hint" aria-hidden="true">psst: ↑↓↑↓</p>
+      <p class="egg-hint" aria-hidden="true">psst: ryan</p>
     </section>
   </main>
 
@@ -799,9 +799,11 @@
 
       renderDaily();
 
-      /* —— Easter egg: logo clicks + short ↑↓↑↓ —— */
-      var EGG_SEQ = ["ArrowUp", "ArrowDown", "ArrowUp", "ArrowDown"];
-      var eggIndex = 0;
+      /* —— Easter egg: type "ryan" (or 5× logo clicks) —— */
+      var CODE = "ryan";
+      var buffer = "";
+      var bufferTimer = null;
+      var BUFFER_TIMEOUT_MS = 1500;
       var brandClicks = 0;
       var brandTimer = null;
       var eggTimer = null;
@@ -821,6 +823,20 @@
         }, reduceMotion ? 8000 : 10000);
       }
 
+      function resetBuffer() {
+        buffer = "";
+        clearTimeout(bufferTimer);
+        bufferTimer = null;
+      }
+
+      function isTypingTarget(el) {
+        if (!el || el === document.body || el === document.documentElement) return false;
+        var tag = (el.tagName || "").toLowerCase();
+        if (tag === "input" || tag === "textarea" || tag === "select") return true;
+        if (el.isContentEditable) return true;
+        return false;
+      }
+
       brand.addEventListener("click", function () {
         brandClicks += 1;
         clearTimeout(brandTimer);
@@ -838,16 +854,34 @@
         }
       });
 
-      window.addEventListener("keydown", function (e) {
-        var key = e.key;
-        if (key === EGG_SEQ[eggIndex]) {
-          eggIndex += 1;
-          if (eggIndex === EGG_SEQ.length) {
-            eggIndex = 0;
+      document.addEventListener("keydown", function (e) {
+        if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (isTypingTarget(e.target)) return;
+        if (e.key.length !== 1) {
+          resetBuffer();
+          return;
+        }
+
+        var ch = e.key.toLowerCase();
+        if (ch < "a" || ch > "z") {
+          resetBuffer();
+          return;
+        }
+
+        clearTimeout(bufferTimer);
+        bufferTimer = setTimeout(resetBuffer, BUFFER_TIMEOUT_MS);
+
+        var next = buffer + ch;
+        if (CODE.indexOf(next) === 0) {
+          buffer = next;
+          if (buffer === CODE) {
+            resetBuffer();
             activateTerminal();
           }
+        } else if (CODE.charAt(0) === ch) {
+          buffer = ch;
         } else {
-          eggIndex = key === EGG_SEQ[0] ? 1 : 0;
+          resetBuffer();
         }
       });
     })();
