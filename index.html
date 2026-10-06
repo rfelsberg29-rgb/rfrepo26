@@ -475,6 +475,16 @@
       font-weight: 400;
     }
 
+    .egg-hint {
+      margin-top: 0.65rem;
+      text-align: left;
+      color: var(--dim);
+      font-size: 0.72rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      opacity: 0.72;
+    }
+
     /* —— Retro terminal easter egg —— */
     body.terminal-mode {
       --bg: #020802;
@@ -673,6 +683,7 @@
       </div>
 
       <p class="foot">Open <code>index.html</code> locally, or serve this folder with any static file server.</p>
+      <p class="egg-hint" aria-hidden="true">psst: ↑↓↑↓</p>
     </section>
   </main>
 
@@ -788,13 +799,9 @@
 
       renderDaily();
 
-      /* —— Easter egg: logo clicks + Konami —— */
-      var KONAMI = [
-        "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
-        "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
-        "b", "a"
-      ];
-      var konamiIndex = 0;
+      /* —— Easter egg: logo clicks + short ↑↓↑↓ —— */
+      var EGG_SEQ = ["ArrowUp", "ArrowDown", "ArrowUp", "ArrowDown"];
+      var eggIndex = 0;
       var brandClicks = 0;
       var brandTimer = null;
       var eggTimer = null;
@@ -832,17 +839,15 @@
       });
 
       window.addEventListener("keydown", function (e) {
-        var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-        var expected = KONAMI[konamiIndex];
-        if (expected.length === 1) expected = expected.toLowerCase();
-        if (key === expected) {
-          konamiIndex += 1;
-          if (konamiIndex === KONAMI.length) {
-            konamiIndex = 0;
+        var key = e.key;
+        if (key === EGG_SEQ[eggIndex]) {
+          eggIndex += 1;
+          if (eggIndex === EGG_SEQ.length) {
+            eggIndex = 0;
             activateTerminal();
           }
         } else {
-          konamiIndex = key === KONAMI[0] ? 1 : 0;
+          eggIndex = key === EGG_SEQ[0] ? 1 : 0;
         }
       });
     })();
