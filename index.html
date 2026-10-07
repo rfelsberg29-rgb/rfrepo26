@@ -485,6 +485,116 @@
       opacity: 0.72;
     }
 
+    /* —— How it works (code explainers) —— */
+    .how {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 3.5rem 1.75rem 4.5rem;
+      border-top: 1px solid var(--line-soft);
+      scroll-margin-top: 1.5rem;
+    }
+
+    .how-head {
+      margin-bottom: 1.75rem;
+      animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .how-head h2 {
+      font-family: "DM Sans", sans-serif;
+      font-size: clamp(1.35rem, 3vw, 1.65rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .how-head p {
+      margin-top: 0.55rem;
+      max-width: 32rem;
+      color: var(--dim);
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .explainers {
+      display: grid;
+      gap: 1.1rem;
+      grid-template-columns: 1fr;
+      animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    }
+
+    @media (min-width: 740px) {
+      .explainers {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.15rem 1.25rem;
+      }
+    }
+
+    .explainer {
+      padding: 1.15rem 1.2rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .explainer h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .explainer .file {
+      display: inline-block;
+      margin-top: 0.35rem;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.72rem;
+      color: var(--dim);
+      letter-spacing: 0.01em;
+    }
+
+    .explainer p {
+      margin-top: 0.55rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    .explainer p code {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.82em;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line-soft);
+      border-radius: 4px;
+      padding: 0.05em 0.35em;
+    }
+
+    .explainer pre {
+      margin-top: 0.85rem;
+      padding: 0.85rem 0.95rem;
+      background: #121212;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .explainer pre code {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.72rem;
+      line-height: 1.55;
+      color: #c8c8c8;
+      white-space: pre;
+    }
+
+    .how .foot {
+      margin-top: 1.75rem;
+    }
+
     /* —— Retro terminal easter egg —— */
     body.terminal-mode {
       --bg: #020802;
@@ -509,8 +619,10 @@
 
     body.terminal-mode .brand,
     body.terminal-mode .catalog-head h2,
+    body.terminal-mode .how-head h2,
     body.terminal-mode .title,
-    body.terminal-mode .daily-panel h3 {
+    body.terminal-mode .daily-panel h3,
+    body.terminal-mode .explainer h3 {
       font-family: "IBM Plex Mono", ui-monospace, monospace;
       letter-spacing: -0.01em;
       text-shadow: 0 0 12px rgba(57, 255, 20, 0.25);
@@ -525,9 +637,21 @@
 
     body.terminal-mode .game,
     body.terminal-mode .daily-panel,
-    body.terminal-mode .daily-chip {
+    body.terminal-mode .daily-chip,
+    body.terminal-mode .explainer {
       border-radius: 2px;
       box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.08);
+    }
+
+    body.terminal-mode .explainer pre {
+      border-radius: 2px;
+      background: #031003;
+      border-color: rgba(57, 255, 20, 0.18);
+    }
+
+    body.terminal-mode .explainer pre code,
+    body.terminal-mode .explainer p code {
+      color: #39ff14;
     }
 
     body.terminal-mode .scroll-arrow,
@@ -590,7 +714,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .overview, .catalog-head, .games, .game, .daily-panel { animation: none; transition: none; }
+      .overview, .catalog-head, .how-head, .explainers, .games, .game, .daily-panel { animation: none; transition: none; }
       .scroll-arrow { animation: none; }
       .game:hover .preview-emoji,
       .game:focus-visible .preview-emoji { transform: none; }
@@ -682,8 +806,104 @@
         </a>
       </div>
 
-      <p class="foot">Open <code>index.html</code> locally, or serve this folder with any static file server.</p>
       <p class="egg-hint" aria-hidden="true">psst: ryan</p>
+    </section>
+
+    <section class="how" id="how-it-works" aria-label="How the code works">
+      <div class="how-head">
+        <h2>How it works</h2>
+        <p>A quick look at a few real pieces of this project — plain language for students, easy for a teacher to skim.</p>
+      </div>
+
+      <div class="explainers">
+        <article class="explainer">
+          <h3>Hub page structure</h3>
+          <span class="file">index.html</span>
+          <p>
+            The landing page is one HTML file with two big sections: an overview at the top,
+            then a catalog of game cards. Each card is a normal link to that game’s page.
+          </p>
+          <pre><code>&lt;header class="overview"&gt;…&lt;/header&gt;
+&lt;section class="catalog" id="games"&gt;
+  &lt;a class="game" href="rifthockey.html"&gt;…&lt;/a&gt;
+  &lt;a class="game" href="street-racing/"&gt;…&lt;/a&gt;
+  &lt;a class="game" href="hangman.html"&gt;…&lt;/a&gt;
+&lt;/section&gt;</code></pre>
+        </article>
+
+        <article class="explainer">
+          <h3>Daily challenge rotation</h3>
+          <span class="file">index.html · script</span>
+          <p>
+            Today’s featured game is chosen from the calendar date
+            (<code>epochDay % 3</code>).
+            Your best attempt is stored in the browser with <code>localStorage</code>
+            under a key like <code>cg-daily-2026-10-07</code>.
+          </p>
+          <pre><code>function challengeForDate(d) {
+  var epochDay = Math.floor(
+    Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())
+    / 86400000
+  );
+  return CHALLENGES[epochDay % CHALLENGES.length];
+}</code></pre>
+        </article>
+
+        <article class="explainer">
+          <h3>Easter egg → terminal mode</h3>
+          <span class="file">index.html · script + CSS</span>
+          <p>
+            Type <strong>ryan</strong> (or click the logo five times). That adds a
+            <code>terminal-mode</code>
+            class on <code>&lt;body&gt;</code>
+            for about 10 seconds — green mono colors via CSS, then it turns off.
+          </p>
+          <pre><code>var CODE = "ryan";
+// key buffer builds "ryan" → activateTerminal()
+document.body.classList.add("terminal-mode");
+setTimeout(function () {
+  document.body.classList.remove("terminal-mode");
+}, 10000);</code></pre>
+        </article>
+
+        <article class="explainer">
+          <h3>Rift Hockey game loop</h3>
+          <span class="file">rifthockey.html</span>
+          <p>
+            The hockey game draws on a <code>&lt;canvas&gt;</code>.
+            A loop asks the browser for the next animation frame, measures elapsed time
+            (<code>dt</code>), updates physics, then redraws.
+          </p>
+          <pre><code>function loop(ts) {
+  let dt = (ts - lastTs) / 1000;
+  dt = Math.min(0.033, dt);
+  tick(dt);                 // move puck, mallets…
+  requestAnimationFrame(loop);
+}</code></pre>
+        </article>
+
+        <article class="explainer">
+          <h3>Curveball letter guessing</h3>
+          <span class="file">hangman.html</span>
+          <p>
+            Each click (or key press) calls <code>guess(letter)</code>.
+            Hits stay in a Set; misses add a strike. Six strikes ends the round.
+            “Throw Curveball” reveals one random hidden letter once per game.
+          </p>
+          <pre><code>function guess(letter) {
+  if (state.over || state.guessed.has(letter)) return;
+  state.guessed.add(letter);
+  if (state.answer.includes(letter)) {
+    if (checkWin()) endGame(true);
+  } else {
+    state.strikes++;
+    if (state.strikes >= MAX_STRIKES) endGame(false);
+  }
+}</code></pre>
+        </article>
+      </div>
+
+      <p class="foot">Open <code>index.html</code> locally, or serve this folder with any static file server.</p>
     </section>
   </main>
 
