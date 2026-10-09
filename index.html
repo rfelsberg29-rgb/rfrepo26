@@ -7,7 +7,7 @@
   <meta name="description" content="A student game collection hub for Rift Hockey, Street Racing, and Curveball — open a game and play in your browser." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #0b0b0b;
@@ -595,169 +595,104 @@
       margin-top: 1.75rem;
     }
 
-    /* —— Soft pink aesthetic easter egg —— */
-    body.pink-mode {
-      --bg: #f8e4ec;
-      --surface: rgba(255, 250, 252, 0.72);
-      --surface-2: rgba(255, 228, 238, 0.88);
-      --text: #4f2f3d;
-      --muted: #8f6576;
-      --dim: #b48a9b;
-      --line: rgba(214, 130, 158, 0.28);
-      --line-soft: rgba(255, 255, 255, 0.45);
-      --accent-soft: rgba(255, 180, 205, 0.35);
-      font-family: "Outfit", "DM Sans", sans-serif;
+    /* —— Retro terminal easter egg —— */
+    body.terminal-mode {
+      --bg: #020802;
+      --surface: #041204;
+      --surface-2: #071a07;
+      --text: #39ff14;
+      --muted: #2ec20a;
+      --dim: #1f8a08;
+      --line: rgba(57, 255, 20, 0.28);
+      --line-soft: rgba(57, 255, 20, 0.12);
+      --accent-soft: rgba(57, 255, 20, 0.06);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       background:
-        radial-gradient(ellipse 55% 42% at 12% 8%, rgba(255, 196, 214, 0.9), transparent 58%),
-        radial-gradient(ellipse 48% 38% at 88% 12%, rgba(255, 168, 198, 0.55), transparent 52%),
-        radial-gradient(ellipse 42% 36% at 70% 78%, rgba(244, 170, 200, 0.45), transparent 55%),
-        radial-gradient(ellipse 50% 40% at 18% 72%, rgba(255, 214, 228, 0.7), transparent 58%),
-        linear-gradient(165deg, #fff6fa 0%, #fce4ee 38%, #f3c9da 72%, #eeb8cc 100%);
-      background-attachment: fixed;
+        repeating-linear-gradient(
+          0deg,
+          transparent 0 2px,
+          rgba(0, 0, 0, 0.12) 2px 3px
+        ),
+        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(57, 255, 20, 0.08), transparent 55%),
+        #020802;
     }
 
-    body.pink-mode .brand {
-      font-family: "Outfit", "DM Sans", sans-serif;
-      font-weight: 500;
-      letter-spacing: -0.045em;
-      color: #6b3a4f;
-      text-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.65),
-        0 12px 40px rgba(214, 120, 155, 0.28);
+    body.terminal-mode .brand,
+    body.terminal-mode .catalog-head h2,
+    body.terminal-mode .how-head h2,
+    body.terminal-mode .title,
+    body.terminal-mode .daily-panel h3,
+    body.terminal-mode .explainer h3 {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      letter-spacing: -0.01em;
+      text-shadow: 0 0 12px rgba(57, 255, 20, 0.25);
     }
 
-    body.pink-mode .catalog-head h2,
-    body.pink-mode .how-head h2,
-    body.pink-mode .title,
-    body.pink-mode .daily-panel h3,
-    body.pink-mode .explainer h3 {
-      font-family: "Outfit", "DM Sans", sans-serif;
-      font-weight: 500;
-      letter-spacing: -0.025em;
-      color: #6b3a4f;
+    body.terminal-mode .preview-emoji {
+      border-radius: 2px;
+      border-color: rgba(57, 255, 20, 0.35);
+      background: rgba(57, 255, 20, 0.05);
+      filter: grayscale(1) brightness(1.35) contrast(1.1);
     }
 
-    body.pink-mode .lede,
-    body.pink-mode .desc,
-    body.pink-mode .blurb,
-    body.pink-mode .catalog-head p,
-    body.pink-mode .how-head p,
-    body.pink-mode .explainer p {
-      color: var(--muted);
-      font-weight: 400;
+    body.terminal-mode .game,
+    body.terminal-mode .daily-panel,
+    body.terminal-mode .daily-chip,
+    body.terminal-mode .explainer {
+      border-radius: 2px;
+      box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.08);
     }
 
-    body.pink-mode .preview-emoji {
-      border-radius: 22px;
-      border-color: rgba(255, 255, 255, 0.55);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.75), rgba(255, 210, 226, 0.55));
-      box-shadow:
-        0 10px 28px rgba(190, 105, 140, 0.14),
-        inset 0 1px 0 rgba(255, 255, 255, 0.7);
-      filter: none;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+    body.terminal-mode .explainer pre {
+      border-radius: 2px;
+      background: #031003;
+      border-color: rgba(57, 255, 20, 0.18);
     }
 
-    body.pink-mode .game,
-    body.pink-mode .daily-panel,
-    body.pink-mode .daily-chip,
-    body.pink-mode .explainer {
-      border-radius: 20px;
-      border-color: rgba(255, 255, 255, 0.55);
-      background:
-        linear-gradient(155deg, rgba(255, 255, 255, 0.62), rgba(255, 236, 244, 0.45));
-      box-shadow:
-        0 14px 40px rgba(170, 90, 125, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(16px) saturate(1.15);
-      -webkit-backdrop-filter: blur(16px) saturate(1.15);
+    body.terminal-mode .explainer pre code,
+    body.terminal-mode .explainer p code {
+      color: #39ff14;
     }
 
-    body.pink-mode .explainer pre {
-      border-radius: 14px;
-      background: rgba(255, 228, 238, 0.65);
-      border-color: rgba(214, 130, 158, 0.22);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+    body.terminal-mode .scroll-arrow,
+    body.terminal-mode .daily-play {
+      border-radius: 2px;
     }
 
-    body.pink-mode .explainer pre code,
-    body.pink-mode .explainer p code {
-      color: #8a4560;
-    }
-
-    body.pink-mode .scroll-arrow,
-    body.pink-mode .daily-play {
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(255, 210, 226, 0.85), rgba(244, 170, 200, 0.55));
-      border-color: rgba(255, 255, 255, 0.55);
-      color: #5a3344;
-      box-shadow: 0 6px 18px rgba(190, 105, 140, 0.16);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
-    body.pink-mode .cta,
-    body.pink-mode .eyebrow,
-    body.pink-mode .kicker {
-      color: #a06078;
-    }
-
-    body.pink-mode::before {
-      content: "";
-      pointer-events: none;
-      position: fixed;
-      inset: -20% -10%;
-      z-index: 0;
-      background:
-        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.55), transparent 28%),
-        radial-gradient(circle at 78% 35%, rgba(255, 190, 215, 0.35), transparent 32%);
-      animation: blush-drift 7s ease-in-out infinite alternate;
-    }
-
-    body.pink-mode::after {
+    body.terminal-mode::after {
       content: "";
       pointer-events: none;
       position: fixed;
       inset: 0;
       z-index: 40;
-      background:
-        radial-gradient(ellipse 90% 55% at 50% 115%, rgba(232, 140, 175, 0.28), transparent 55%),
-        radial-gradient(ellipse 45% 35% at 8% 85%, rgba(255, 210, 228, 0.3), transparent 50%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 30%, rgba(230, 140, 175, 0.08));
-      opacity: 0.9;
-      animation: blush-pulse 3.6s ease-in-out infinite;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.08) 50%
+      );
+      background-size: 100% 3px;
+      opacity: 0.35;
+      animation: crt-flicker 2.8s steps(2) infinite;
     }
 
-    .pink-toast {
+    .terminal-toast {
       position: fixed;
       left: 1rem;
       bottom: 1rem;
       z-index: 50;
-      font-family: "Outfit", "DM Sans", sans-serif;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #6b3a4f;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 230, 240, 0.7));
-      border: 1px solid rgba(255, 255, 255, 0.65);
-      padding: 0.6rem 1rem;
-      border-radius: 999px;
+      color: #39ff14;
+      background: rgba(0, 12, 0, 0.92);
+      border: 1px solid rgba(57, 255, 20, 0.4);
+      padding: 0.55rem 0.75rem;
+      border-radius: 2px;
       opacity: 0;
       pointer-events: none;
       transform: translateY(6px);
-      transition: opacity 0.28s ease, transform 0.28s ease;
-      box-shadow:
-        0 10px 28px rgba(180, 100, 130, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(14px) saturate(1.2);
-      -webkit-backdrop-filter: blur(14px) saturate(1.2);
+      transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
-    .pink-toast.show {
+    .terminal-toast.show {
       opacity: 1;
       transform: translateY(0);
     }
@@ -772,14 +707,9 @@
       50% { transform: translateY(4px); }
     }
 
-    @keyframes blush-pulse {
-      0%, 100% { opacity: 0.72; }
-      50% { opacity: 1; }
-    }
-
-    @keyframes blush-drift {
-      from { transform: translate3d(0, 0, 0) scale(1); }
-      to { transform: translate3d(2%, 1.5%, 0) scale(1.04); }
+    @keyframes crt-flicker {
+      0%, 100% { opacity: 0.28; }
+      50% { opacity: 0.4; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -789,9 +719,8 @@
       .game:hover .preview-emoji,
       .game:focus-visible .preview-emoji { transform: none; }
       body { transition: none; }
-      body.pink-mode::before,
-      body.pink-mode::after { animation: none; opacity: 0.8; }
-      .pink-toast { transition: none; transform: none; }
+      body.terminal-mode::after { animation: none; opacity: 0.2; }
+      .terminal-toast { transition: none; transform: none; }
     }
   </style>
 </head>
@@ -921,19 +850,19 @@
         </article>
 
         <article class="explainer">
-          <h3>Easter egg → pink mode</h3>
+          <h3>Easter egg → terminal mode</h3>
           <span class="file">index.html · script + CSS</span>
           <p>
             Type <strong>ryan</strong> (or click the logo five times). That adds a
-            <code>pink-mode</code>
+            <code>terminal-mode</code>
             class on <code>&lt;body&gt;</code>
-            for about 10 seconds — soft blush gradients, glass cards, and modern type via CSS, then it turns off.
+            for about 10 seconds — green mono colors via CSS, then it turns off.
           </p>
           <pre><code>var CODE = "ryan";
-// key buffer builds "ryan" → activatePinkMode()
-document.body.classList.add("pink-mode");
+// key buffer builds "ryan" → activateTerminal()
+document.body.classList.add("terminal-mode");
 setTimeout(function () {
-  document.body.classList.remove("pink-mode");
+  document.body.classList.remove("terminal-mode");
 }, 10000);</code></pre>
         </article>
 
@@ -978,7 +907,7 @@ setTimeout(function () {
     </section>
   </main>
 
-  <div class="pink-toast" id="pink-toast" role="status" aria-live="polite">PINK MODE // 10s</div>
+  <div class="terminal-toast" id="terminal-toast" role="status" aria-live="polite">TERMINAL MODE // 10s</div>
 
   <script>
     (function () {
@@ -1098,18 +1027,18 @@ setTimeout(function () {
       var brandClicks = 0;
       var brandTimer = null;
       var eggTimer = null;
-      var toast = document.getElementById("pink-toast");
+      var toast = document.getElementById("terminal-toast");
       var brand = document.getElementById("brand");
       var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      function activatePinkMode() {
-        if (document.body.classList.contains("pink-mode")) return;
-        document.body.classList.add("pink-mode");
-        toast.textContent = reduceMotion ? "PINK MODE" : "PINK MODE // 10s";
+      function activateTerminal() {
+        if (document.body.classList.contains("terminal-mode")) return;
+        document.body.classList.add("terminal-mode");
+        toast.textContent = reduceMotion ? "TERMINAL MODE" : "TERMINAL MODE // 10s";
         toast.classList.add("show");
         clearTimeout(eggTimer);
         eggTimer = setTimeout(function () {
-          document.body.classList.remove("pink-mode");
+          document.body.classList.remove("terminal-mode");
           toast.classList.remove("show");
         }, reduceMotion ? 8000 : 10000);
       }
@@ -1134,7 +1063,7 @@ setTimeout(function () {
         brandTimer = setTimeout(function () { brandClicks = 0; }, 900);
         if (brandClicks >= 5) {
           brandClicks = 0;
-          activatePinkMode();
+          activateTerminal();
         }
       });
 
@@ -1167,7 +1096,7 @@ setTimeout(function () {
           buffer = next;
           if (buffer === CODE) {
             resetBuffer();
-            activatePinkMode();
+            activateTerminal();
           }
         } else if (CODE.charAt(0) === ch) {
           buffer = ch;
